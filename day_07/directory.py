@@ -44,5 +44,29 @@ def folder_size(directory):
     return size
 
 
-folder_size(directories)
+USED_SPACE = folder_size(directories)
 print(f'The sum of the small directories is {sum(small_directories)}')
+
+TOTAL_SPACE = 70000000
+REQUIRED_SPACE = 30000000
+FREE_SPACE = TOTAL_SPACE - USED_SPACE
+NEEDED_SPACE = REQUIRED_SPACE - FREE_SPACE
+
+potential_directories = []
+
+
+def evaluate_for_deletion(directory):
+    size = sum(file['size'] for file in directory['files'])
+    for folder in directory:
+        if folder != 'files':
+            directory_size = evaluate_for_deletion(directory[folder])
+            if directory_size >= NEEDED_SPACE:
+                potential_directories.append(directory_size)
+            size += directory_size
+    return size
+
+
+evaluate_for_deletion(directories)
+
+potential_directories.sort()
+print(f'We can delete a directory sized {potential_directories[0]} to make room')
